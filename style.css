@@ -1,0 +1,391 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #3157d5;
+    --primary-dark: #2443b5;
+    --text: #18233c;
+    --muted: #7d879b;
+    --border: #e4e8f0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: #f2f5fb;
+    font-family: 'Cairo', sans-serif;
+    color: var(--text);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 1050px;
+    min-height: 620px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(31, 49, 91, 0.12);
+}
+
+.brand-panel {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 45px;
+    color: white;
+    background: linear-gradient(145deg, #182e75, #3157d5 65%, #5478f1);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 800;
+    z-index: 1;
+}
+
+.brand-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: var(--primary);
+    background: white;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.brand-content {
+    position: relative;
+    z-index: 1;
+    margin: 45px 0;
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 22px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.brand-content h1 {
+    margin-bottom: 20px;
+    font-size: clamp(30px, 3vw, 43px);
+    line-height: 1.6;
+    font-weight: 800;
+}
+
+.brand-content p {
+    max-width: 350px;
+    color: #e1e8ff;
+    font-size: 14px;
+    line-height: 2;
+}
+
+.brand-footer {
+    z-index: 1;
+    color: #d4ddff;
+    font-size: 11px;
+    direction: ltr;
+    text-align: right;
+}
+
+.decor-circle {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+}
+
+.circle-one {
+    width: 300px;
+    height: 300px;
+    left: -110px;
+    top: 90px;
+}
+
+.circle-two {
+    width: 420px;
+    height: 420px;
+    left: -170px;
+    top: 30px;
+}
+
+.form-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 55px 50px;
+}
+
+.mobile-brand {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 35px;
+    color: var(--primary);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.mobile-brand .brand-icon {
+    background: var(--primary);
+    color: white;
+}
+
+.form-heading {
+    margin-bottom: 30px;
+}
+
+.welcome {
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-heading h2 {
+    margin: 8px 0;
+    font-size: 29px;
+    font-weight: 800;
+}
+
+.form-heading p {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+input {
+    width: 100%;
+    height: 51px;
+    margin-bottom: 22px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    background: #fbfcff;
+    font-family: inherit;
+    font-size: 13px;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49, 87, 213, 0.1);
+}
+
+input::placeholder {
+    color: #a4adbd;
+}
+
+.password-heading {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    width: 100%;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+button span {
+    font-size: 21px;
+}
+
+.message {
+    min-height: 22px;
+    margin-top: 12px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.message.error {
+    color: #d33b49;
+}
+
+.message.success {
+    color: #18875d;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+    color: #9aa3b4;
+    font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.register-text {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.register-text a {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.register-text a:hover {
+    text-decoration: underline;
+}
+
+.security-note {
+    margin-top: 35px;
+    text-align: center;
+    color: #9aa3b4;
+    font-size: 11px;
+}
+
+@media (max-width: 760px) {
+    body {
+        padding: 16px;
+    }
+
+    .login-container {
+        max-width: 480px;
+        min-height: auto;
+        grid-template-columns: 1fr;
+        border-radius: 18px;
+    }
+
+    .brand-panel {
+        display: none;
+    }
+
+    .mobile-brand {
+        display: flex;
+    }
+
+    .form-panel {
+        padding: 35px 25px;
+    }
+
+    .form-heading h2 {
+        font-size: 26px;
+    }
+}
+
+/* تحسين تنسيق إنشاء حساب الطالب */
+#registerForm {
+    margin-top: 24px;
+}
+
+#registerForm h3 {
+    margin: 0 0 22px;
+    font-size: 24px;
+    color: #172554;
+}
+
+#registerForm label {
+    display: block;
+    margin: 18px 0 10px;
+    font-weight: 600;
+}
+
+#registerForm input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 18px;
+}
+
+#registerForm button {
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 14px;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #3155dc;
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#registerForm button:hover {
+    background: #2445c5;
+}
+
+#registerForm button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#registerForm #backToLogin {
+    background: #eef2ff;
+    color: #2445c5;
+    border: 1px solid #dbe3ff;
+}
+
+#registerForm #backToLogin:hover {
+    background: #e0e7ff;
+}
+
+#registerForm input:focus {
+    outline: 2px solid #3155dc;
+    outline-offset: 1px;
+}
+
+@media (max-width: 600px) {
+    #registerForm h3 {
+        font-size: 21px;
+    }
+
+    #registerForm button {
+        min-height: 48px;
+    }
+}

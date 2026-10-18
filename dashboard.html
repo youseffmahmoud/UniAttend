@@ -1,0 +1,1032 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102b55">
+
+    <title>UniAttend | لوحة الطالب</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        #qrReader {
+            width: 100%;
+            max-width: 520px;
+            min-height: 0;
+            overflow: hidden;
+            border-radius: 14px;
+        }
+        #qrReader video {
+            width: 100% !important;
+            height: auto !important;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        #qrReader__scan_region {
+            min-height: 220px;
+        }
+        @media (max-width: 600px) {
+            #qrReader { max-width: 100%; }
+            #qrReader video { max-height: 55vh; }
+        }
+        :root {
+            --ua-primary: #1746a2;
+            --ua-dark: #102b55;
+            --ua-bg: #f4f7fc;
+            --ua-card: #ffffff;
+            --ua-text: #1c2940;
+            --ua-muted: #738098;
+            --ua-border: #e4eaf3;
+            --ua-radius: 18px;
+        }
+
+        body {
+            margin: 0;
+            background: var(--ua-bg);
+            color: var(--ua-text);
+            font-family: Arial, Tahoma, sans-serif;
+        }
+
+        .ua-layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 245px minmax(0, 1fr);
+        }
+
+        .ua-sidebar {
+            background: var(--ua-dark);
+            color: white;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .ua-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: 800;
+            padding: 0 8px;
+        }
+
+        .ua-brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: #ffffff;
+            color: var(--ua-primary);
+            font-size: 23px;
+        }
+
+        .ua-nav {
+            display: grid;
+            gap: 9px;
+        }
+
+        .ua-nav button {
+            border: 0;
+            border-radius: 11px;
+            padding: 13px 14px;
+            background: transparent;
+            color: #d8e4fa;
+            text-align: right;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .ua-nav button:hover,
+        .ua-nav button.active {
+            background: #244576;
+            color: #fff;
+        }
+
+        .ua-sidebar-note {
+            margin-top: auto;
+            color: #d8e4fa;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .ua-main {
+            min-width: 0;
+            padding: 30px;
+        }
+
+        .ua-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .ua-topbar h1 {
+            font-size: 27px;
+            margin: 0 0 8px;
+        }
+
+        .ua-muted {
+            color: var(--ua-muted);
+            line-height: 1.8;
+        }
+
+        .ua-user-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid var(--ua-border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+
+        .ua-avatar {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            border-radius: 50%;
+            background: #e8efff;
+            color: var(--ua-primary);
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+        }
+
+        .ua-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .ua-card {
+            background: var(--ua-card);
+            border: 1px solid var(--ua-border);
+            border-radius: var(--ua-radius);
+            padding: 24px;
+            min-width: 0;
+            box-shadow: 0 5px 20px rgba(22, 48, 91, 0.035);
+        }
+
+        .ua-card h2,
+        .ua-card h3 {
+            margin-top: 0;
+        }
+
+        .ua-card p {
+            line-height: 1.8;
+        }
+
+        .ua-full {
+            grid-column: 1 / -1;
+        }
+
+        .ua-profile-list {
+            display: grid;
+            gap: 0;
+            margin: 0;
+        }
+
+        .ua-profile-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--ua-border);
+        }
+
+        .ua-profile-row:last-child {
+            border-bottom: 0;
+        }
+
+        .ua-profile-row dt {
+            color: var(--ua-muted);
+        }
+
+        .ua-profile-row dd {
+            margin: 0;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+            text-align: left;
+        }
+
+        .ua-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border: 0;
+            border-radius: 11px;
+            padding: 12px 17px;
+            background: var(--ua-primary);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .ua-button:hover {
+            filter: brightness(1.08);
+        }
+
+        .ua-button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .ua-button-secondary {
+            background: #eaf0fc;
+            color: var(--ua-primary);
+        }
+
+        .ua-qr-icon {
+            width: 82px;
+            height: 82px;
+            margin: 8px auto 20px;
+            border: 2px dashed #a8bee9;
+            border-radius: 20px;
+            display: grid;
+            place-items: center;
+            color: var(--ua-primary);
+            font-size: 42px;
+        }
+
+        .ua-center {
+            text-align: center;
+        }
+
+        .ua-notice {
+            background: #f0f5ff;
+            color: #234477;
+            border: 1px solid #dce7ff;
+            border-radius: 12px;
+            padding: 14px;
+            line-height: 1.8;
+        }
+
+        .ua-message {
+            margin-top: 15px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .ua-error {
+            color: #b42318;
+        }
+
+        .ua-section[hidden] {
+            display: none !important;
+        }
+
+        .ua-footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--ua-muted);
+        }
+
+        @media (max-width: 800px) {
+            .ua-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .ua-sidebar {
+                padding: 16px;
+                gap: 16px;
+            }
+
+            .ua-nav {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .ua-nav button {
+                text-align: center;
+                padding: 12px 6px;
+                font-size: 13px;
+            }
+
+            .ua-sidebar-note {
+                display: none;
+            }
+
+            .ua-main {
+                padding: 20px 14px;
+            }
+
+            .ua-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ua-full {
+                grid-column: auto;
+            }
+
+            .ua-topbar h1 {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .ua-profile-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .ua-profile-row dd {
+                text-align: right;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ua-layout">
+
+        <!-- Sidebar -->
+        <aside class="ua-sidebar">
+            <div class="ua-brand">
+                <div class="ua-brand-icon">U</div>
+                <span>UniAttend</span>
+            </div>
+
+            <nav class="ua-nav" aria-label="القائمة الرئيسية">
+                <button
+                    type="button"
+                    class="active"
+                    data-section="overview">
+                    الرئيسية
+                </button>
+
+                <button type="button" data-section="scan">
+                    تسجيل الحضور
+                </button>
+
+                <button type="button" data-section="history">
+                    سجل الحضور
+                </button>
+            </nav>
+
+            <div class="ua-sidebar-note">
+                نظام الحضور الجامعي الذكي
+                <br>
+                تابع محاضراتك وحضورك من مكان واحد.
+            </div>
+
+            <button
+                id="logoutButton"
+                class="ua-button"
+                type="button">
+                تسجيل الخروج
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ua-main">
+            <header class="ua-topbar">
+                <div>
+                    <h1 id="pageTitle">الرئيسية</h1>
+                    <p class="ua-muted">
+                        مرحبًا بك في لوحة متابعة حضورك الجامعي.
+                    </p>
+                </div>
+
+                <div class="ua-user-chip">
+                    <div class="ua-avatar" aria-hidden="true">ط</div>
+                    <div>
+                        <strong id="headerStudentName">
+                            جاري التحميل...
+                        </strong>
+                        <div class="ua-muted">حساب طالب</div>
+                    </div>
+                </div>
+            </header>
+
+            <p
+                id="dashboardMessage"
+                class="ua-message"
+                role="status"
+                aria-live="polite"></p>
+
+            <!-- Overview -->
+            <section id="overviewSection" class="ua-section">
+                <div class="ua-grid">
+
+                    <article class="ua-card">
+                        <h2>أهلًا بيك 👋</h2>
+                        <p class="ua-muted">
+                            من هنا تقدر تراجع بيانات حسابك وتنتقل لتسجيل
+                            حضور المحاضرات.
+                        </p>
+
+                        <button
+                            class="ua-button"
+                            type="button"
+                            data-go="scan">
+                            تسجيل حضور محاضرة
+                        </button>
+                    </article>
+
+                    <article class="ua-card">
+                        <h2>ملخص الحضور</h2>
+                        <p class="ua-muted">
+                            سيتم عرض إحصائيات حضورك بعد ربط لوحة الطالب
+                            ببيانات المحاضرات وسجل الحضور في قاعدة البيانات.
+                        </p>
+
+                        <div class="ua-notice">
+                            لم يتم تحميل إحصائيات الحضور حتى الآن.
+                        </div>
+                    </article>
+
+                    <article class="ua-card ua-full">
+                        <h2>بيانات الطالب</h2>
+
+                        <dl class="ua-profile-list">
+                            <div class="ua-profile-row">
+                                <dt>الاسم الكامل</dt>
+                                <dd id="studentName">جاري التحميل...</dd>
+                            </div>
+
+                            <div class="ua-profile-row">
+                                <dt>الرقم الجامعي</dt>
+                                <dd id="studentUniversityId">
+                                    جاري التحميل...
+                                </dd>
+                            </div>
+
+                            <div class="ua-profile-row">
+                                <dt>البريد الإلكتروني</dt>
+                                <dd id="studentEmail">جاري التحميل...</dd>
+                            </div>
+                        </dl>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- QR Attendance -->
+            <section id="scanSection" class="ua-section" hidden>
+                <article class="ua-card ua-center">
+                    <h2>تسجيل حضور محاضرة</h2>
+
+                    <p class="ua-muted">
+                        امسح رمز QR الذي يعرضه الدكتور أثناء المحاضرة
+                        لتسجيل حضورك بعد التحقق من الشروط المطلوبة.
+                    </p>
+
+                    <div id="qrReader" style="display:none; max-width:520px; margin:18px auto;"></div>
+                    <div class="ua-qr-icon" id="qrPlaceholder" aria-hidden="true">▦</div>
+
+                    <div class="ua-notice">
+                        تسجيل الحضور يحتاج إلى التحقق من صلاحية رمز QR
+                        ومدة المحاضرة وموقعك الجغرافي من خلال النظام.
+                    </div>
+
+                    <p class="ua-muted">
+                        اسمح باستخدام الكاميرا والموقع عند الطلب، ثم وجّه الكاميرا إلى رمز الدكتور.
+                    </p>
+
+                    <button
+                        id="scanQrButton"
+                        class="ua-button"
+                        type="button">
+                        مسح رمز QR
+                    </button>
+
+                    <p
+                        id="scanMessage"
+                        class="ua-message"
+                        role="status"
+                        aria-live="polite"></p>
+                </article>
+            </section>
+
+            <!-- Attendance History -->
+            <section id="historySection" class="ua-section" hidden>
+                <article class="ua-card">
+                    <h2>سجل الحضور</h2>
+
+                    <p class="ua-muted">
+                        يعرض هذا القسم سجلات الحضور المسجلة لحسابك.
+                    </p>
+                </article>
+            </section>
+
+            <footer class="ua-footer">
+                UniAttend · Smart Attendance Management System
+            </footer>
+        </main>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="supabase-config.js"></script>
+
+    <script>
+        // التأكد من تحميل إعدادات Supabase
+        if (
+            !window.supabase ||
+            typeof SUPABASE_URL === "undefined" ||
+            typeof SUPABASE_PUBLISHABLE_KEY === "undefined"
+        ) {
+            console.error("Supabase configuration is missing.");
+
+            document.getElementById("dashboardMessage").textContent =
+                "تعذر تشغيل النظام: راجع إعدادات Supabase.";
+
+            document.getElementById("dashboardMessage").className =
+                "ua-message ua-error";
+
+            throw new Error("Supabase configuration is missing.");
+        }
+
+        const client = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+        );
+
+        const dashboardMessage =
+            document.getElementById("dashboardMessage");
+
+        const pageTitle =
+            document.getElementById("pageTitle");
+
+        const sections = {
+            overview: document.getElementById("overviewSection"),
+            scan: document.getElementById("scanSection"),
+            history: document.getElementById("historySection")
+        };
+
+        const titles = {
+            overview: "الرئيسية",
+            scan: "تسجيل الحضور",
+            history: "سجل الحضور"
+        };
+
+        // عرض رسائل الصفحة
+        function showDashboardMessage(text, isError = false) {
+            dashboardMessage.textContent = text;
+            dashboardMessage.className = isError
+                ? "ua-message ua-error"
+                : "ua-message";
+        }
+
+        // التنقل بين الأقسام
+        function openSection(sectionName) {
+            if (!sections[sectionName]) {
+                return;
+            }
+
+            Object.entries(sections).forEach(([name, section]) => {
+                section.hidden = name !== sectionName;
+            });
+
+            document.querySelectorAll("[data-section]").forEach(button => {
+                button.classList.toggle(
+                    "active",
+                    button.dataset.section === sectionName
+                );
+            });
+
+            pageTitle.textContent = titles[sectionName];
+        }
+
+        document.querySelectorAll("[data-section]").forEach(button => {
+            button.addEventListener("click", () => {
+                openSection(button.dataset.section);
+            });
+        });
+
+        document.querySelectorAll("[data-go]").forEach(button => {
+            button.addEventListener("click", () => {
+                openSection(button.dataset.go);
+            });
+        });
+
+        // تحميل بيانات الطالب والتحقق من الصلاحيات
+        async function loadStudent() {
+            try {
+                showDashboardMessage("جاري تحميل بيانات الطالب...");
+
+                // 1. التحقق من جلسة المستخدم
+                const {
+                    data: authData,
+                    error: authError
+                } = await client.auth.getUser();
+
+                if (authError) {
+                    throw authError;
+                }
+
+                if (!authData.user) {
+                    window.location.replace("index.html");
+                    return;
+                }
+
+                const user = authData.user;
+
+                // 2. قراءة بيانات الملف الشخصي
+                const {
+                    data: profile,
+                    error: profileError
+                } = await client
+                    .from("profiles")
+                    .select("id, full_name, university_id, role")
+                    .eq("id", user.id)
+                    .maybeSingle();
+
+                if (profileError) {
+                    console.error(
+                        "PROFILE LOAD FAILED:",
+                        profileError
+                    );
+
+                    throw profileError;
+                }
+
+                // 3. توحيد الدور قبل التحقق منه
+                const role = String(profile?.role || "")
+                    .trim()
+                    .toLowerCase();
+
+                if (!profile || role !== "student") {
+                    showDashboardMessage(
+                        "تعذر التحقق من صلاحية حساب الطالب. " +
+                        "تأكد من وجود سجل صحيح في profiles.",
+                        true
+                    );
+
+                    await client.auth.signOut();
+                    window.location.replace("index.html");
+                    return;
+                }
+
+                // 4. عرض بيانات الطالب
+                const name =
+                    profile.full_name ||
+                    user.user_metadata?.full_name ||
+                    "غير مسجل";
+
+                document.getElementById("studentName").textContent =
+                    name;
+
+                document.getElementById(
+                    "headerStudentName"
+                ).textContent = name;
+
+                document.getElementById(
+                    "studentUniversityId"
+                ).textContent =
+                    profile.university_id ||
+                    user.user_metadata?.university_id ||
+                    "غير مسجل";
+
+                document.getElementById("studentEmail").textContent =
+                    user.email || "غير متاح";
+
+                // 5. نجاح التحميل
+                showDashboardMessage("");
+
+                console.log("STUDENT DASHBOARD LOADED:", {
+                    userId: user.id,
+                    role: role,
+                    profileLoaded: true
+                });
+
+            } catch (error) {
+                console.error("Dashboard error:", error);
+
+                showDashboardMessage(
+                    "تعذر تحميل بيانات الطالب: " +
+                    (error?.message || "خطأ غير معروف"),
+                    true
+                );
+            }
+        }
+
+        // QR scanner + secure attendance check-in
+        let qrScanner = null;
+        let scanBusy = false;
+
+        const scanButton = document.getElementById("scanQrButton");
+        const qrReaderElement = document.getElementById("qrReader");
+        const qrPlaceholderElement = document.getElementById("qrPlaceholder");
+
+        function showScanMessage(text, isError = false) {
+            const el = document.getElementById("scanMessage");
+            el.textContent = text;
+            el.className = isError ? "ua-message ua-error" : "ua-message";
+        }
+
+        function extractQrToken(decodedText) {
+            const raw = String(decodedText || "").trim();
+            if (!raw) return "";
+
+            // QR may contain a URL with a token parameter.
+            try {
+                const url = new URL(raw);
+                const token = url.searchParams.get("qr_token")
+                    || url.searchParams.get("token")
+                    || url.searchParams.get("token_value");
+                if (token) return token.trim();
+            } catch (_) {
+                // The QR may contain a raw token rather than a URL.
+            }
+
+            // QR may contain JSON, e.g. { "qr_token": "..." }.
+            try {
+                const obj = JSON.parse(raw);
+                if (obj && typeof obj === "object") {
+                    const token = obj.qr_token || obj.token || obj.token_value;
+                    if (token) return String(token).trim();
+                }
+            } catch (_) {
+                // Not JSON; use the decoded text below.
+            }
+
+            // Support QR payloads that contain only the token.
+            return raw;
+        }
+
+        async function stopQrScanner() {
+            if (!qrScanner) return;
+            const scannerToStop = qrScanner;
+            qrScanner = null;
+            try {
+                if (scannerToStop.isScanning) await scannerToStop.stop();
+            } catch (error) {
+                console.warn("QR scanner stop warning:", error);
+            }
+            try {
+                scannerToStop.clear();
+            } catch (error) {
+                console.warn("QR scanner clear warning:", error);
+            }
+        }
+
+        function resetScannerUi() {
+            qrReaderElement.style.display = "none";
+            qrPlaceholderElement.style.display = "grid";
+            scanButton.disabled = false;
+            scanButton.textContent = "مسح رمز QR";
+        }
+
+        function getStudentLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error("المتصفح لا يدعم تحديد الموقع الجغرافي."));
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    position => resolve({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    }),
+                    error => {
+                        const messages = {
+                            1: "اسمح للموقع باستخدام موقعك الجغرافي ثم حاول مرة أخرى.",
+                            2: "تعذر تحديد موقعك. تأكد من تشغيل خدمة الموقع.",
+                            3: "انتهت مهلة تحديد الموقع. حاول مرة أخرى."
+                        };
+                        reject(new Error(messages[error.code] || "تعذر تحديد موقعك."));
+                    },
+                    { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
+                );
+            });
+        }
+
+        async function handleScannedQr(decodedText) {
+            if (scanBusy) return;
+            scanBusy = true;
+            scanButton.disabled = true;
+            showScanMessage("تمت قراءة رمز QR. جارٍ التحقق من موقعك وتسجيل الحضور...");
+
+            try {
+                const token = extractQrToken(decodedText);
+                if (!token) throw new Error("رمز QR فارغ أو غير صالح.");
+
+                await stopQrScanner();
+                resetScannerUi();
+                scanButton.disabled = true;
+                scanButton.textContent = "جارٍ تسجيل الحضور...";
+
+                const studentLocation = await getStudentLocation();
+
+                // Location/radius validation must be performed securely by this Supabase RPC.
+                const { data, error } = await client.rpc("check_in_with_qr", {
+                    p_qr_token: token,
+                    p_latitude: studentLocation.latitude,
+                    p_longitude: studentLocation.longitude
+                });
+                if (error) throw error;
+
+                const result = Array.isArray(data) ? data[0] : data;
+                if (!result) throw new Error("لم يرجع النظام نتيجة لتسجيل الحضور.");
+                if (result.success === false || result.ok === false) {
+                    throw new Error(result.message || result.error || "لم يتم قبول تسجيل الحضور.");
+                }
+
+                showScanMessage(
+                    "تم تسجيل حضورك بنجاح" +
+                    (result.course_name ? " في محاضرة: " + result.course_name : "") +
+                    (result.checked_in_at
+                        ? " — الوقت: " + new Date(result.checked_in_at).toLocaleTimeString("ar-EG")
+                        : "")
+                );
+
+                await loadAttendanceHistory();
+            } catch (error) {
+                console.error("QR check-in failed:", error);
+                showScanMessage(
+                    "لم يتم تسجيل الحضور: " + (error?.message || "خطأ غير معروف"),
+                    true
+                );
+                await stopQrScanner();
+                resetScannerUi();
+            } finally {
+                scanBusy = false;
+                scanButton.disabled = false;
+                scanButton.textContent = "مسح رمز QR";
+            }
+        }
+
+        scanButton.addEventListener("click", async () => {
+            if (scanBusy) return;
+
+            // If a scanner is active, the same button stops it.
+            if (qrScanner) {
+                await stopQrScanner();
+                resetScannerUi();
+                showScanMessage("تم إيقاف الكاميرا.");
+                return;
+            }
+
+            if (!window.Html5Qrcode) {
+                showScanMessage(
+                    "تعذر تحميل مكتبة قراءة QR. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.",
+                    true
+                );
+                return;
+            }
+
+            if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+                showScanMessage("الكاميرا تحتاج إلى HTTPS أو localhost. افتح الصفحة من رابط آمن.", true);
+                return;
+            }
+
+            try {
+                qrReaderElement.style.display = "block";
+                qrPlaceholderElement.style.display = "none";
+                scanButton.disabled = true;
+                scanButton.textContent = "جارٍ تشغيل الكاميرا...";
+                showScanMessage("جارٍ تشغيل الكاميرا...");
+
+                qrScanner = new Html5Qrcode("qrReader", {
+                    verbose: false,
+                    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
+                });
+
+                const scanConfig = {
+                    fps: 15,
+                    qrbox: (viewfinderWidth, viewfinderHeight) => {
+                        const size = Math.max(
+                            180,
+                            Math.min(320, Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.70))
+                        );
+                        return { width: size, height: size };
+                    },
+                    aspectRatio: 1.0,
+                    disableFlip: false
+                };
+
+                // Prefer the rear camera on phones. If the browser does not support
+                // facingMode, fall back to the first camera returned by the library.
+                try {
+                    await qrScanner.start(
+                        { facingMode: "environment" },
+                        scanConfig,
+                        handleScannedQr,
+                        () => {}
+                    );
+                } catch (firstCameraError) {
+                    console.warn("Rear-camera start failed; trying an available camera:", firstCameraError);
+                    const cameras = await Html5Qrcode.getCameras();
+                    if (!cameras || cameras.length === 0) throw firstCameraError;
+                    const preferredCamera = cameras.find(camera => /back|rear|environment|خلف/i.test(camera.label || "")) || cameras[0];
+                    await qrScanner.start(
+                        preferredCamera.id,
+                        scanConfig,
+                        handleScannedQr,
+                        () => {}
+                    );
+                }
+
+                scanButton.disabled = false;
+                scanButton.textContent = "إيقاف الكاميرا";
+                showScanMessage("وجّه الكاميرا إلى رمز QR الذي يعرضه الدكتور، وقرّب الرمز إذا كان صغيرًا.");
+            } catch (error) {
+                console.error("Camera start failed:", error);
+                await stopQrScanner();
+                resetScannerUi();
+                showScanMessage(
+                    "تعذر تشغيل الكاميرا: " + (error?.message || error) +
+                    " — تأكد من السماح بالكاميرا واستخدام HTTPS أو localhost.",
+                    true
+                );
+            }
+        });
+
+        async function loadAttendanceHistory() {
+            const section = document.getElementById("historySection");
+            try {
+                const { data: authData, error: authError } = await client.auth.getUser();
+                if (authError) throw authError;
+                if (!authData.user) return;
+                const { data, error } = await client
+                    .from("attendance_records")
+                    .select("id, checked_in_at, distance_m, courses(name, code)")
+                    .eq("student_id", authData.user.id)
+                    .order("checked_in_at", { ascending: false });
+                if (error) throw error;
+
+                const card = section.querySelector("article");
+                card.innerHTML = '<h2>سجل الحضور</h2>';
+                if (!data || data.length === 0) {
+                    card.innerHTML += '<div class="ua-notice">لا توجد سجلات حضور حتى الآن.</div>';
+                    return;
+                }
+                const table = document.createElement("div");
+                table.style.overflowX = "auto";
+                table.innerHTML = '<table style="width:100%;border-collapse:collapse;text-align:right"><thead><tr><th style="padding:10px;border-bottom:1px solid #e4eaf3">المحاضرة</th><th style="padding:10px;border-bottom:1px solid #e4eaf3">وقت الحضور</th><th style="padding:10px;border-bottom:1px solid #e4eaf3">المسافة (م)</th></tr></thead><tbody></tbody></table>';
+                const tbody = table.querySelector("tbody");
+                data.forEach(row => {
+                    const tr = document.createElement("tr");
+                    const course = Array.isArray(row.courses) ? row.courses[0] : row.courses;
+                    [course?.name || course?.code || "محاضرة", row.checked_in_at ? new Date(row.checked_in_at).toLocaleString("ar-EG") : "—",
+                     row.distance_m == null ? "—" : Math.round(Number(row.distance_m))].forEach(value => {
+                        const td = document.createElement("td");
+                        td.style.padding = "10px";
+                        td.style.borderBottom = "1px solid #e4eaf3";
+                        td.textContent = String(value);
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                card.appendChild(table);
+            } catch (error) {
+                console.error("Attendance history load failed:", error);
+                const card = section.querySelector("article");
+                card.innerHTML = '<h2>سجل الحضور</h2><p class="ua-error">تعذر تحميل سجل الحضور: ' +
+                    String(error?.message || "خطأ غير معروف").replace(/[<>&"]/g, "") + '</p>';
+            }
+        }
+
+        document.querySelectorAll('[data-section="history"]').forEach(button => {
+            button.addEventListener("click", loadAttendanceHistory);
+        });
+
+        // تسجيل الخروج
+        document.getElementById("logoutButton").addEventListener(
+            "click",
+            async function () {
+                const button = this;
+                button.disabled = true;
+
+                try {
+                    const { error } = await client.auth.signOut();
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    window.location.replace("index.html");
+
+                } catch (error) {
+                    console.error("Logout error:", error);
+
+                    showDashboardMessage(
+                        "تعذر تسجيل الخروج. حاول مرة أخرى.",
+                        true
+                    );
+
+                    button.disabled = false;
+                }
+            }
+        );
+
+        // تشغيل الصفحة
+        openSection("overview");
+        loadStudent();
+    </script>
+</body>
+</html>
