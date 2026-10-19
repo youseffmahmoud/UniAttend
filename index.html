@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="UniAttend - نظام الحضور الجامعي باستخدام QR Code والتحقق من الموقع."
+    >
+
+    <title>UniAttend | تسجيل الدخول</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+    <main class="login-container">
+
+        <!-- Brand Panel -->
+        <section class="brand-panel">
+            <div class="brand">
+                <div class="brand-icon">U</div>
+                <span>UniAttend</span>
+            </div>
+
+            <div class="brand-content">
+                <span class="eyebrow">SMART ATTENDANCE SYSTEM</span>
+
+                <h1>
+                    حضورك الجامعي،
+                    <br>
+                    بشكل أذكى.
+                </h1>
+
+                <p>
+                    تابع حضورك الجامعي بسهولة من خلال رمز QR
+                    والتحقق من موقع المحاضرة.
+                </p>
+
+                <div class="brand-features">
+                    <div class="brand-feature">
+                        <span aria-hidden="true">✓</span>
+                        تسجيل حضور إلكتروني
+                    </div>
+
+                    <div class="brand-feature">
+                        <span aria-hidden="true">✓</span>
+                        التحقق من موقع المحاضرة
+                    </div>
+
+                    <div class="brand-feature">
+                        <span aria-hidden="true">✓</span>
+                        متابعة سجل الحضور
+                    </div>
+                </div>
+            </div>
+
+            <div class="brand-footer">
+                Smart Attendance Management System
+            </div>
+
+            <div class="decor-circle circle-one"></div>
+            <div class="decor-circle circle-two"></div>
+        </section>
+
+        <!-- Login Panel -->
+        <section class="form-panel">
+
+            <div class="mobile-brand">
+                <div class="brand-icon">U</div>
+                <span>UniAttend</span>
+            </div>
+
+            <div class="form-heading">
+                <span class="welcome">أهلًا بعودتك </span>
+                <h2>تسجيل الدخول</h2>
+                <p>اختار نوع حسابك، وبعدها أدخل بيانات تسجيل الدخول.</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="role-selection">
+                <label for="loginRole">نوع الحساب</label>
+
+                <select id="loginRole" name="loginRole" required>
+                    <option value="student" selected>طالب Student</option>
+                    <option value="doctor">دكتور Doctor</option>
+                </select>
+
+                <p class="field-hint">
+                    حساب الدكتور يتم إنشاؤه بواسطة مسؤول النظام.
+                </p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <label for="email">البريد الإلكتروني</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="name@university.edu"
+                    autocomplete="username"
+                    required
+                >
+
+                <div class="password-heading">
+                    <label for="password">كلمة المرور</label>
+                </div>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="أدخل كلمة المرور"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button type="submit" id="loginButton">
+                    <span>تسجيل الدخول</span>
+                    <span aria-hidden="true">←</span>
+                </button>
+
+                <p
+                    id="message"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+            </form>
+
+            <div class="divider">
+                <span>أو</span>
+            </div>
+
+            <!-- Student Registration -->
+            <section
+                id="registerForm"
+                class="register-form"
+                aria-labelledby="registerHeading"
+                hidden
+            >
+                <h3 id="registerHeading">إنشاء حساب طالب</h3>
+
+                <label for="fullName">الاسم الكامل</label>
+                <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    placeholder="اكتب اسمك بالكامل"
+                    autocomplete="name"
+                >
+
+                <label for="universityId">الرقم الجامعي</label>
+                <input
+                    type="text"
+                    id="universityId"
+                    name="universityId"
+                    placeholder="اكتب رقمك الجامعي"
+                >
+
+                <label for="registerEmail">البريد الإلكتروني</label>
+                <input
+                    type="email"
+                    id="registerEmail"
+                    name="registerEmail"
+                    placeholder="name@university.edu"
+                    autocomplete="email"
+                >
+
+                <label for="registerPassword">كلمة المرور</label>
+                <input
+                    type="password"
+                    id="registerPassword"
+                    name="registerPassword"
+                    placeholder="أنشئ كلمة مرور"
+                    autocomplete="new-password"
+                >
+
+                <button type="button" id="registerButton">
+                    إنشاء حساب الطالب
+                </button>
+
+                <button type="button" id="backToLogin">
+                    العودة لتسجيل الدخول
+                </button>
+
+                <p
+                    id="registerMessage"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+            </section>
+
+            <p class="register-text" id="registerText">
+                طالب جديد؟
+                <a href="#" id="registerLink">إنشاء حساب طالب</a>
+            </p>
+
+            <p class="security-note">
+                <span aria-hidden="true">🔒</span>
+                بياناتك الجامعية محمية
+            </p>
+        </section>
+    </main>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
+ 
