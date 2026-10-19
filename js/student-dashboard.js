@@ -184,8 +184,20 @@
         let scanBusy = false;
 
         const scanButton = document.getElementById("scanQrButton");
-        const qrReaderElement = document.getElementById("qrReader");
-        const qrPlaceholderElement = document.getElementById("qrPlaceholder");
+const qrReaderElement = document.getElementById("qrReader");
+const qrPlaceholderElement = document.getElementById("qrPlaceholder");
+
+const getStudentLocationButton =
+    document.getElementById("getStudentLocationButton");
+
+const studentLocationMessage =
+    document.getElementById("studentLocationMessage");
+
+const studentLocationAccuracy =
+    document.getElementById("studentLocationAccuracy");
+
+let studentLocationReady = false;
+let lastStudentLocation = null;
 
         function showScanMessage(text, isError = false) {
             const el = document.getElementById("scanMessage");
@@ -271,7 +283,67 @@
                 );
             });
         }
+// تحديد موقع الطالب يدويًا قبل تشغيل الكاميرا
+getStudentLocationButton.addEventListener("click", async () => {
+    if (scanBusy || qrScanner) {
+        studentLocationMessage.textContent =
+            "أوقف الكاميرا أولًا قبل إعادة تحديد الموقع.";
+        return;
+    }
 
+    getStudentLocationButton.disabled = true;
+    getStudentLocationButton.textContent = "جارٍ تحديد الموقع...";
+    studentLocationMessage.textContent =
+        "جارٍ تحديد موقعك بدقة عالية...";
+    studentLocationAccuracy.textContent = "";
+
+    studentLocationReady = false;
+    lastStudentLocation = null;
+
+    try {
+        const locationData = await getStudentLocation();
+
+        studentLocationAccuracy.textContent =
+            `دقة الموقع الحالية: حوالي ${Math.round(locationData.accuracy)} متر.`;
+
+        if (
+            !Number.isFinite(locationData.accuracy) ||
+            locationData.accuracy > 10
+        ) {
+            throw new Error(
+                "دقة الموقع غير كافية. المطلوب 10 أمتار أو أفضل. " +
+                "فعّل الموقع الدقيق وحاول مرة أخرى في مكان مفتوح."
+            );
+        }
+
+        lastStudentLocation = locationData;
+        studentLocationReady = true;
+
+        studentLocationMessage.textContent =
+            "تم تحديد موقعك بنجاح. يمكنك الآن مسح رمز QR.";
+
+        showScanMessage(
+            "تم التحقق من دقة موقعك. اضغط على «مسح رمز QR» للمتابعة."
+        );
+
+    } catch (error) {
+        studentLocationReady = false;
+        lastStudentLocation = null;
+
+        studentLocationMessage.textContent =
+            error.message || "تعذر تحديد الموقع. حاول مرة أخرى.";
+
+        showScanMessage(
+            "تعذر تحديد موقعك: " +
+            (error.message || "خطأ غير معروف"),
+            true
+        );
+
+    } finally {
+        getStudentLocationButton.disabled = false;
+        getStudentLocationButton.textContent = "تحديد موقعي";
+    }
+});
         async function handleScannedQr(decodedText) {
             if (scanBusy) return;
             scanBusy = true;
@@ -287,14 +359,23 @@
                 scanButton.disabled = true;
                 scanButton.textContent = "جارٍ تسجيل الحضور...";
 
-                const studentLocation = await getStudentLocation();
+                // إعادة قراءة الموقع لحظة تسجيل الحضور
+const studentLocation = await getStudentLocation();
 
-                // Location/radius validation must be performed securely by this Supabase RPC.
-                const { data, error } = await client.rpc("check_in_with_qr", {
-                    p_qr_token: token,
-                    p_latitude: studentLocation.latitude,
-                    p_longitude: studentLocation.longitude
-                });
+const { data, error } = await client.rpc("check_in_with_qr", {
+    p_qr_token: token,
+    p_latitude: studentLocation.latitude,
+    p_longitude: studentLocation.longitude
+});
+
+if (error) throw error;
+// يتحقق Supabase من المسافة بين الطالب وموقع المحاضرة
+const { data, error } = await client.rpc("check_in_with_qr", {
+    p_qr_token: token,
+    p_latitude: studentLocation.latitude,
+    p_longitude: studentLocation.longitude
+});
+
                 if (error) throw error;
 
                 const result = Array.isArray(data) ? data[0] : data;
@@ -321,97 +402,170 @@
                 await stopQrScanner();
                 resetScannerUi();
             } finally {
-                scanBusy = false;
-                scanButton.disabled = false;
-                scanButton.textContent = "مسح رمز QR";
-            }
+    scanBusy = false;
+    scanButton.disabled = false;
+    scanButton.textContent = "مسح رمز QR";
+
+    studentLocationReady = false;
+    lastStudentLocation = null;
+
+    studentLocationMessage.textContent =
+        "حدد موقعك من جديد قبل محاولة الحضور التالية.";
+
+    studentLocationAccuracy.textContent = "";
+}
         }
 
-        scanButton.addEventListener("click", async () => {
-            if (scanBusy) return;
 
-            // If a scanner is active, the same button stops it.
-            if (qrScanner) {
-                await stopQrScanner();
-                resetScannerUi();
-                showScanMessage("تم إيقاف الكاميرا.");
-                return;
-            }
+scanButton.addEventListener("click", async () => {
+    if (scanBusy) return;
 
-            if (!window.Html5Qrcode) {
-                showScanMessage(
-                    "تعذر تحميل مكتبة قراءة QR. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.",
-                    true
-                );
-                return;
-            }
+    // إذا كانت الكاميرا تعمل، أوقفها
+    if (qrScanner) {
+        await stopQrScanner();
+        resetScannerUi();
 
-            if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-                showScanMessage("الكاميرا تحتاج إلى HTTPS أو localhost. افتح الصفحة من رابط آمن.", true);
-                return;
-            }
+        studentLocationReady = false;
+        lastStudentLocation = null;
 
-            try {
-                qrReaderElement.style.display = "block";
-                qrPlaceholderElement.style.display = "none";
-                scanButton.disabled = true;
-                scanButton.textContent = "جارٍ تشغيل الكاميرا...";
-                showScanMessage("جارٍ تشغيل الكاميرا...");
+        studentLocationMessage.textContent =
+            "حدد موقعك من جديد قبل محاولة الحضور التالية.";
 
-                qrScanner = new Html5Qrcode("qrReader", {
-                    verbose: false,
-                    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
-                });
+        studentLocationAccuracy.textContent = "";
+        showScanMessage("تم إيقاف الكاميرا.");
+        return;
+    }
 
-                const scanConfig = {
-                    fps: 15,
-                    qrbox: (viewfinderWidth, viewfinderHeight) => {
-                        const size = Math.max(
-                            180,
-                            Math.min(320, Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.70))
-                        );
-                        return { width: size, height: size };
-                    },
-                    aspectRatio: 1.0,
-                    disableFlip: false
-                };
+    if (!window.Html5Qrcode) {
+        showScanMessage(
+            "تعذر تحميل مكتبة قراءة QR. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.",
+            true
+        );
+        return;
+    }
 
-                // Prefer the rear camera on phones. If the browser does not support
-                // facingMode, fall back to the first camera returned by the library.
-                try {
-                    await qrScanner.start(
-                        { facingMode: "environment" },
-                        scanConfig,
-                        handleScannedQr,
-                        () => {}
-                    );
-                } catch (firstCameraError) {
-                    console.warn("Rear-camera start failed; trying an available camera:", firstCameraError);
-                    const cameras = await Html5Qrcode.getCameras();
-                    if (!cameras || cameras.length === 0) throw firstCameraError;
-                    const preferredCamera = cameras.find(camera => /back|rear|environment|خلف/i.test(camera.label || "")) || cameras[0];
-                    await qrScanner.start(
-                        preferredCamera.id,
-                        scanConfig,
-                        handleScannedQr,
-                        () => {}
-                    );
-                }
+    if (
+        !window.isSecureContext &&
+        location.hostname !== "localhost" &&
+        location.hostname !== "127.0.0.1"
+    ) {
+        showScanMessage(
+            "الكاميرا تحتاج إلى HTTPS أو localhost. افتح الصفحة من رابط آمن.",
+            true
+        );
+        return;
+    }
 
-                scanButton.disabled = false;
-                scanButton.textContent = "إيقاف الكاميرا";
-                showScanMessage("وجّه الكاميرا إلى رمز QR الذي يعرضه الدكتور، وقرّب الرمز إذا كان صغيرًا.");
-            } catch (error) {
-                console.error("Camera start failed:", error);
-                await stopQrScanner();
-                resetScannerUi();
-                showScanMessage(
-                    "تعذر تشغيل الكاميرا: " + (error?.message || error) +
-                    " — تأكد من السماح بالكاميرا واستخدام HTTPS أو localhost.",
-                    true
-                );
-            }
+    try {
+        // اطلب موقع الطالب قبل فتح الكاميرا
+        scanButton.disabled = true;
+        scanButton.textContent = "جارٍ تحديد موقعك...";
+        showScanMessage("جارٍ تحديد موقعك قبل تشغيل الكاميرا...");
+
+        studentLocationReady = false;
+        lastStudentLocation = null;
+
+        const locationData = await getStudentLocation();
+
+        // لا نرفض الموقع بسبب قيمة accuracy؛
+        // التحقق من نطاق الحضور يتم داخل Supabase.
+        lastStudentLocation = locationData;
+        studentLocationReady = true;
+
+        studentLocationMessage.textContent =
+            "تم تحديد موقعك. يمكنك الآن مسح رمز QR.";
+
+        studentLocationAccuracy.textContent =
+            `دقة الموقع المقدّرة: حوالي ${Math.round(locationData.accuracy)} متر.`;
+
+        // افتح الكاميرا بعد الحصول على الموقع
+        qrReaderElement.style.display = "block";
+        qrPlaceholderElement.style.display = "none";
+        scanButton.textContent = "جارٍ تشغيل الكاميرا...";
+        showScanMessage("تم تحديد الموقع. جارٍ تشغيل الكاميرا...");
+
+        qrScanner = new Html5Qrcode("qrReader", {
+            verbose: false,
+            formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
         });
+
+        const scanConfig = {
+            fps: 15,
+            qrbox: (viewfinderWidth, viewfinderHeight) => {
+                const size = Math.max(
+                    180,
+                    Math.min(
+                        320,
+                        Math.floor(
+                            Math.min(viewfinderWidth, viewfinderHeight) * 0.70
+                        )
+                    )
+                );
+                return { width: size, height: size };
+            },
+            aspectRatio: 1.0,
+            disableFlip: false
+        };
+
+        try {
+            await qrScanner.start(
+                { facingMode: "environment" },
+                scanConfig,
+                handleScannedQr,
+                () => {}
+            );
+        } catch (firstCameraError) {
+            console.warn(
+                "Rear-camera start failed; trying an available camera:",
+                firstCameraError
+            );
+
+            const cameras = await Html5Qrcode.getCameras();
+
+            if (!cameras || cameras.length === 0) {
+                throw firstCameraError;
+            }
+
+            const preferredCamera =
+                cameras.find(camera =>
+                    /back|rear|environment|خلف/i.test(camera.label || "")
+                ) || cameras[0];
+
+            await qrScanner.start(
+                preferredCamera.id,
+                scanConfig,
+                handleScannedQr,
+                () => {}
+            );
+        }
+
+        scanButton.disabled = false;
+        scanButton.textContent = "إيقاف الكاميرا";
+
+        showScanMessage(
+            "وجّه الكاميرا إلى رمز QR الذي يعرضه الدكتور."
+        );
+
+    } catch (error) {
+        console.error("Location or camera start failed:", error);
+
+        await stopQrScanner();
+        resetScannerUi();
+
+        studentLocationReady = false;
+        lastStudentLocation = null;
+
+        studentLocationMessage.textContent =
+            error?.message || "تعذر تحديد الموقع أو تشغيل الكاميرا.";
+
+        showScanMessage(
+            "تعذر تحديد الموقع أو تشغيل الكاميرا: " +
+            (error?.message || "خطأ غير معروف"),
+            true
+        );
+    }
+});
+
 
         async function loadAttendanceHistory() {
             const section = document.getElementById("historySection");
