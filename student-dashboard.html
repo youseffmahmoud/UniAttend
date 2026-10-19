@@ -148,6 +148,31 @@
                     <div id="qrReader" style="display:none; max-width:520px; margin:18px auto;"></div>
                     <div class="ua-qr-icon" id="qrPlaceholder" aria-hidden="true">▦</div>
 
+<div class="ua-location-box">
+    <h3>التحقق من موقعك</h3>
+
+    <p class="ua-muted">
+        حدّد موقعك قبل مسح رمز QR. سيُعاد التحقق من موقعك عند كل محاولة حضور.
+    </p>
+
+    <button
+        id="getStudentLocationButton"
+        class="ua-button"
+        type="button">
+        تحديد موقعي
+    </button>
+
+    <p
+        id="studentLocationMessage"
+        class="ua-message"
+        role="status"
+        aria-live="polite">
+        لم يتم تحديد الموقع بعد.
+    </p>
+
+    <p id="studentLocationAccuracy" class="ua-muted"></p>
+</div>
+
                     <div class="ua-notice">
                         تسجيل الحضور يحتاج إلى التحقق من صلاحية رمز QR
                         ومدة المحاضرة وموقعك الجغرافي من خلال النظام.
