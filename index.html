@@ -12,6 +12,13 @@
 
     <title>UniAttend | تسجيل الدخول</title>
     <link rel="stylesheet" href="css/login.css">
+
+    <!-- ضمان احترام خاصية hidden -->
+    <style>
+        [hidden] {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -64,7 +71,7 @@
             <div class="decor-circle circle-two"></div>
         </section>
 
-        <!-- Login Panel -->
+        <!-- Form Panel -->
         <section class="form-panel">
 
             <div class="mobile-brand">
@@ -72,67 +79,78 @@
                 <span>UniAttend</span>
             </div>
 
-            <div class="form-heading">
-                <span class="welcome">أهلًا بعودتك </span>
-                <h2>تسجيل الدخول</h2>
-                <p>اختار نوع حسابك، وبعدها أدخل بيانات تسجيل الدخول.</p>
-            </div>
+            <!-- Login Section -->
+            <div id="loginSection">
 
-            <!-- Role Selection -->
-            <div class="role-selection">
-                <label for="loginRole">نوع الحساب</label>
-
-                <select id="loginRole" name="loginRole" required>
-                    <option value="student" selected>طالب Student</option>
-                    <option value="doctor">دكتور Doctor</option>
-                </select>
-
-                <p class="field-hint">
-                    حساب الدكتور يتم إنشاؤه بواسطة مسؤول النظام.
-                </p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="loginForm">
-                <label for="email">البريد الإلكتروني</label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="name@university.edu"
-                    autocomplete="username"
-                    required
-                >
-
-                <div class="password-heading">
-                    <label for="password">كلمة المرور</label>
+                <div class="form-heading">
+                    <span class="welcome">أهلًا بعودتك</span>
+                    <h2>تسجيل الدخول</h2>
+                    <p>
+                        اختار نوع حسابك، وبعدها أدخل بيانات تسجيل الدخول.
+                    </p>
                 </div>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="أدخل كلمة المرور"
-                    autocomplete="current-password"
-                    required
-                >
+                <div class="role-selection">
+                    <label for="loginRole">نوع الحساب</label>
 
-                <button type="submit" id="loginButton">
-                    <span>تسجيل الدخول</span>
-                    <span aria-hidden="true">←</span>
-                </button>
+                    <select id="loginRole" name="loginRole" required>
+                        <option value="student" selected>طالب Student</option>
+                        <option value="doctor">دكتور Doctor</option>
+                    </select>
 
-                <p
-                    id="message"
-                    class="message"
-                    role="status"
-                    aria-live="polite"
-                ></p>
-            </form>
+                    <p class="field-hint">
+                        حساب الدكتور يتم إنشاؤه بواسطة مسؤول النظام.
+                    </p>
+                </div>
 
-            <div class="divider">
-                <span>أو</span>
+                <form id="loginForm">
+                    <label for="email">البريد الإلكتروني</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="name@university.edu"
+                        autocomplete="username"
+                        required
+                    >
+
+                    <div class="password-heading">
+                        <label for="password">كلمة المرور</label>
+                    </div>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="أدخل كلمة المرور"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button type="submit" id="loginButton">
+                        <span>تسجيل الدخول</span>
+                        <span aria-hidden="true">←</span>
+                    </button>
+
+                    <p
+                        id="message"
+                        class="message"
+                        role="status"
+                        aria-live="polite"
+                    ></p>
+                </form>
+
+                <div class="divider">
+                    <span>أو</span>
+                </div>
+
+                <p class="register-text" id="registerText">
+                    طالب جديد؟
+                    <a href="#" id="registerLink">
+                        إنشاء حساب طالب
+                    </a>
+                </p>
             </div>
 
             <!-- Student Registration -->
@@ -142,7 +160,13 @@
                 aria-labelledby="registerHeading"
                 hidden
             >
-                <h3 id="registerHeading">إنشاء حساب طالب</h3>
+                <div class="form-heading">
+                    <span class="welcome">انضم إلى UniAttend</span>
+                    <h2 id="registerHeading">إنشاء حساب طالب</h2>
+                    <p>
+                        أدخل بياناتك الجامعية لإنشاء حساب جديد.
+                    </p>
+                </div>
 
                 <label for="fullName">الاسم الكامل</label>
                 <input
@@ -151,6 +175,8 @@
                     name="fullName"
                     placeholder="اكتب اسمك بالكامل"
                     autocomplete="name"
+                    minlength="2"
+                    required
                 >
 
                 <label for="universityId">الرقم الجامعي</label>
@@ -159,6 +185,11 @@
                     id="universityId"
                     name="universityId"
                     placeholder="اكتب رقمك الجامعي"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    pattern="[0-9]+"
+                    maxlength="20"
+                    required
                 >
 
                 <label for="registerEmail">البريد الإلكتروني</label>
@@ -168,6 +199,7 @@
                     name="registerEmail"
                     placeholder="name@university.edu"
                     autocomplete="email"
+                    required
                 >
 
                 <label for="registerPassword">كلمة المرور</label>
@@ -175,15 +207,34 @@
                     type="password"
                     id="registerPassword"
                     name="registerPassword"
-                    placeholder="أنشئ كلمة مرور"
+                    placeholder="أنشئ كلمة مرور (8 أحرف على الأقل)"
                     autocomplete="new-password"
+                    minlength="8"
+                    required
                 >
 
-                <button type="button" id="registerButton">
+                <label for="confirmPassword">تأكيد كلمة المرور</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="أعد كتابة كلمة المرور"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required
+                >
+
+                <button
+                    type="button"
+                    id="registerButton"
+                >
                     إنشاء حساب الطالب
                 </button>
 
-                <button type="button" id="backToLogin">
+                <button
+                    type="button"
+                    id="backToLogin"
+                >
                     العودة لتسجيل الدخول
                 </button>
 
@@ -195,13 +246,8 @@
                 ></p>
             </section>
 
-            <p class="register-text" id="registerText">
-                طالب جديد؟
-                <a href="#" id="registerLink">إنشاء حساب طالب</a>
-            </p>
-
             <p class="security-note">
-                <span aria-hidden="true">🔒</span>
+                <span aria-hidden="true"></span>
                 بياناتك الجامعية محمية
             </p>
         </section>
@@ -213,4 +259,3 @@
     <script src="js/login.js"></script>
 </body>
 </html>
- 
