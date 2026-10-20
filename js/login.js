@@ -116,7 +116,6 @@ loginRole?.addEventListener("change", () => {
 });
 
 // جلب دور المستخدم من جدول profiles
-
 async function getUserRole(userId) {
     const { data, error } = await supabaseClient
         .from("profiles")
@@ -138,7 +137,6 @@ async function getUserRole(userId) {
         );
     }
 
-    // توحيد الحروف قبل التحقق من الدور
     const normalizedRole = String(data.role)
         .trim()
         .toLowerCase();
@@ -151,7 +149,6 @@ async function getUserRole(userId) {
 
     return normalizedRole;
 }
-
 
 // تسجيل الدخول
 loginForm?.addEventListener("submit", async (event) => {
@@ -181,7 +178,6 @@ loginForm?.addEventListener("submit", async (event) => {
     showMessage("جاري التحقق من بيانات الدخول...");
 
     try {
-        // أولًا: التحقق من البريد الإلكتروني وكلمة المرور
         const { data, error } =
             await supabaseClient.auth.signInWithPassword({
                 email,
@@ -198,23 +194,14 @@ loginForm?.addEventListener("submit", async (event) => {
             throw error;
         }
 
-        console.log("AUTH SIGN-IN SUCCESS:", {
-            userId: data.user?.id,
-            emailConfirmedAt: data.user?.email_confirmed_at
-        });
-
         if (!data.user) {
             throw new Error(
                 "تمت الاستجابة من خدمة الدخول دون بيانات المستخدم."
             );
         }
 
-        // ثانيًا: التحقق من الدور مرة واحدة فقط
         const actualRole = await getUserRole(data.user.id);
 
-        console.log("ROLE CHECK SUCCESS:", actualRole);
-
-        // التأكد من أن نوع الحساب المختار صحيح
         if (actualRole !== selectedRole) {
             await supabaseClient.auth.signOut();
 
@@ -227,7 +214,6 @@ loginForm?.addEventListener("submit", async (event) => {
 
         showMessage("تم تسجيل الدخول بنجاح.");
 
-        // الانتقال إلى لوحة التحكم المناسبة
         if (actualRole === "student") {
             window.location.href = STUDENT_DASHBOARD;
         } else {
@@ -238,12 +224,10 @@ loginForm?.addEventListener("submit", async (event) => {
         console.error("LOGIN ERROR:", error);
 
         const errorMessage = error?.message || "";
+        let errorText =
+            "حدث خطأ غير متوقع أثناء تسجيل الدخول.";
 
-        let errorText = "حدث خطأ غير متوقع أثناء تسجيل الدخول.";
-
-        if (
-            errorMessage === "Invalid login credentials"
-        ) {
+        if (errorMessage === "Invalid login credentials") {
             errorText =
                 "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
         } else if (
@@ -252,16 +236,10 @@ loginForm?.addEventListener("submit", async (event) => {
             errorText =
                 "من فضلك أكّد بريدك الإلكتروني أولًا.";
         } else if (
-            errorMessage.includes("profiles")
-        ) {
-            errorText = errorMessage;
-        } else if (
+            errorMessage.includes("profiles") ||
             errorMessage.includes("دور الحساب") ||
             errorMessage.includes("حساب طالب") ||
-            errorMessage.includes("حساب دكتور")
-        ) {
-            errorText = errorMessage;
-        } else if (
+            errorMessage.includes("حساب دكتور") ||
             errorMessage.includes("تعذر التحقق")
         ) {
             errorText = errorMessage;
@@ -277,6 +255,111 @@ loginForm?.addEventListener("submit", async (event) => {
     }
 });
 
+// أدوات التحقق من بيانات التسجيل
+function normalizeEmail(value) {
+    return String(value || "").trim().toLowerCase();
+}
+
+function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function isValidFullName(value) {
+    const name = String(value || "").trim();
+
+    return (
+        /^(?=.*[\p{L}])[\p{L}\p{M}]+(?:[ '\u2019-][\p{L}\p{M}]+)*$/u.test(name) &&
+        name.replace(/[^\p{L}\p{M}]/gu, "").length >= 2
+    );
+}
+
+function isValidUniversityId(value) {
+    // أرقام إنجليزية فقط مع الاحتفاظ بالأصفار في البداية.
+    return /^[0-9]{1,20}$/.test(String(value || "").trim());
+}
+
+function setFieldError(field, text) {
+    if (!field) return;
+
+    field.setCustomValidity(text || "");
+    field.setAttribute("aria-invalid", text ? "true" : "false");
+}
+
+const fullNameInput = document.getElementById("fullName");
+const universityIdInput = document.getElementById("universityId");
+const registerEmailInput = document.getElementById("registerEmail");
+const registerPasswordInput = document.getElementById("registerPassword");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+
+// الرقم الجامعي: أرقام إنجليزية فقط
+universityIdInput?.addEventListener("input", () => {
+    universityIdInput.value =
+        universityIdInput.value.replace(/[^0-9]/g, "");
+
+    setFieldError(
+        universityIdInput,
+        universityIdInput.value &&
+        !isValidUniversityId(universityIdInput.value)
+            ? "الرقم الجامعي يجب أن يتكون من أرقام إنجليزية فقط."
+            : ""
+    );
+});
+
+// الاسم الكامل
+fullNameInput?.addEventListener("input", () => {
+    setFieldError(
+        fullNameInput,
+        fullNameInput.value.trim() &&
+        !isValidFullName(fullNameInput.value.trim())
+            ? "اكتب اسمك بالحروف، مع إمكانية استخدام المسافات والشرطة."
+            : ""
+    );
+});
+
+// البريد الإلكتروني
+registerEmailInput?.addEventListener("input", () => {
+    registerEmailInput.value =
+        registerEmailInput.value.replace(/\s/g, "");
+
+    setFieldError(
+        registerEmailInput,
+        registerEmailInput.value &&
+        !isValidEmail(normalizeEmail(registerEmailInput.value))
+            ? "أدخل بريدًا إلكترونيًا صحيحًا مثل name@example.com."
+            : ""
+    );
+});
+
+// كلمة المرور
+registerPasswordInput?.addEventListener("input", () => {
+    setFieldError(
+        registerPasswordInput,
+        registerPasswordInput.value &&
+        registerPasswordInput.value.length < 8
+            ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل."
+            : ""
+    );
+
+    if (confirmPasswordInput?.value) {
+        setFieldError(
+            confirmPasswordInput,
+            confirmPasswordInput.value !== registerPasswordInput.value
+                ? "تأكيد كلمة المرور غير مطابق."
+                : ""
+        );
+    }
+});
+
+// تأكيد كلمة المرور
+confirmPasswordInput?.addEventListener("input", () => {
+    setFieldError(
+        confirmPasswordInput,
+        confirmPasswordInput.value !== registerPasswordInput?.value
+            ? "تأكيد كلمة المرور غير مطابق."
+            : ""
+    );
+});
+
 // إنشاء حساب طالب جديد
 registerButton?.addEventListener("click", async () => {
     clearMessages();
@@ -290,19 +373,29 @@ registerButton?.addEventListener("click", async () => {
         return;
     }
 
-    const fullName =
-        document.getElementById("fullName")?.value.trim();
+    const fullName = fullNameInput?.value.trim() || "";
+    const universityId = universityIdInput?.value.trim() || "";
+    const email = normalizeEmail(registerEmailInput?.value);
+    const password = registerPasswordInput?.value || "";
+    const confirmPassword = confirmPasswordInput?.value || "";
 
-    const universityId =
-        document.getElementById("universityId")?.value.trim();
+    [
+        fullNameInput,
+        universityIdInput,
+        registerEmailInput,
+        registerPasswordInput,
+        confirmPasswordInput
+    ].forEach((field) => {
+        if (field) setFieldError(field, "");
+    });
 
-    const email =
-        document.getElementById("registerEmail")?.value.trim();
-
-    const password =
-        document.getElementById("registerPassword")?.value;
-
-    if (!fullName || !universityId || !email || !password) {
+    if (
+        !fullName ||
+        !universityId ||
+        !email ||
+        !password ||
+        !confirmPassword
+    ) {
         showMessage(
             "من فضلك املأ جميع البيانات المطلوبة.",
             "error",
@@ -311,16 +404,88 @@ registerButton?.addEventListener("click", async () => {
         return;
     }
 
-    if (password.length < 6) {
+    if (!isValidFullName(fullName)) {
+        setFieldError(
+            fullNameInput,
+            "اكتب اسمك بالحروف، ولا تترك الاسم فارغًا أو أرقامًا فقط."
+        );
+
         showMessage(
-            "كلمة المرور يجب أن تكون 6 أحرف على الأقل.",
+            "يرجى تصحيح الاسم الكامل.",
             "error",
             registerMessage
         );
+
+        fullNameInput?.focus();
+        return;
+    }
+
+    if (!isValidUniversityId(universityId)) {
+        setFieldError(
+            universityIdInput,
+            "الرقم الجامعي يجب أن يحتوي على أرقام إنجليزية فقط."
+        );
+
+        showMessage(
+            "الرقم الجامعي غير صحيح.",
+            "error",
+            registerMessage
+        );
+
+        universityIdInput?.focus();
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        setFieldError(
+            registerEmailInput,
+            "أدخل بريدًا إلكترونيًا صحيحًا مثل name@example.com."
+        );
+
+        showMessage(
+            "صيغة البريد الإلكتروني غير صحيحة.",
+            "error",
+            registerMessage
+        );
+
+        registerEmailInput?.focus();
+        return;
+    }
+
+    if (password.length < 8) {
+        setFieldError(
+            registerPasswordInput,
+            "كلمة المرور يجب أن تكون 8 أحرف على الأقل."
+        );
+
+        showMessage(
+            "كلمة المرور قصيرة جدًا؛ استخدم 8 أحرف على الأقل.",
+            "error",
+            registerMessage
+        );
+
+        registerPasswordInput?.focus();
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        setFieldError(
+            confirmPasswordInput,
+            "تأكيد كلمة المرور غير مطابق."
+        );
+
+        showMessage(
+            "كلمتا المرور غير متطابقتين.",
+            "error",
+            registerMessage
+        );
+
+        confirmPasswordInput?.focus();
         return;
     }
 
     registerButton.disabled = true;
+    registerButton.setAttribute("aria-busy", "true");
 
     showMessage(
         "جاري إنشاء الحساب...",
@@ -329,19 +494,20 @@ registerButton?.addEventListener("click", async () => {
     );
 
     try {
-        const { data, error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-                emailRedirectTo:
-                    window.location.origin + "/index.html",
+        const { data, error } =
+            await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo:
+                        window.location.origin + "/index.html",
 
-                data: {
-                    full_name: fullName,
-                    university_id: universityId
+                    data: {
+                        full_name: fullName,
+                        university_id: universityId
+                    }
                 }
-            }
-        });
+            });
 
         if (error) {
             console.error("SIGNUP FAILED:", {
@@ -355,13 +521,13 @@ registerButton?.addEventListener("click", async () => {
 
         if (data.session) {
             showMessage(
-                "تم إنشاء الحساب. تأكد من وجود سجل مطابق في جدول profiles قبل تسجيل الدخول.",
+                "تم إنشاء الحساب بنجاح. تحقق من ظهور بيانات الطالب في جدول profiles قبل تسجيل الدخول.",
                 "",
                 registerMessage
             );
         } else {
             showMessage(
-                "تم إرسال طلب إنشاء الحساب. راجع بريدك الإلكتروني لتأكيده إذا كان التأكيد مطلوبًا.",
+                "تم إرسال طلب إنشاء الحساب. إذا كان تأكيد البريد مطلوبًا، راجع بريدك الإلكتروني.",
                 "",
                 registerMessage
             );
@@ -375,15 +541,37 @@ registerButton?.addEventListener("click", async () => {
     } catch (error) {
         console.error("SIGNUP ERROR:", error);
 
+        const rawMessage = error?.message || "";
+        let friendlyMessage =
+            rawMessage || "حدث خطأ غير متوقع.";
+
+        if (/rate limit|too many requests/i.test(rawMessage)) {
+            friendlyMessage =
+                "تم تجاوز حد طلبات التسجيل أو رسائل البريد. انتظر قليلًا ثم حاول مرة واحدة.";
+        } else if (
+            /already registered|user already exists/i.test(rawMessage)
+        ) {
+            friendlyMessage =
+                "هذا البريد مسجل بالفعل. جرّب تسجيل الدخول بدل إنشاء حساب جديد.";
+        } else if (/invalid email/i.test(rawMessage)) {
+            friendlyMessage = "صيغة البريد الإلكتروني غير مقبولة.";
+        } else if (
+            /password/i.test(rawMessage) &&
+            /least|short|weak/i.test(rawMessage)
+        ) {
+            friendlyMessage =
+                "كلمة المرور لا تستوفي شروط الأمان المطلوبة.";
+        }
+
         showMessage(
-            "تعذر إنشاء الحساب: " +
-                (error?.message || "حدث خطأ غير متوقع."),
+            "تعذر إنشاء الحساب: " + friendlyMessage,
             "error",
             registerMessage
         );
 
     } finally {
         registerButton.disabled = false;
+        registerButton.removeAttribute("aria-busy");
     }
 });
 
