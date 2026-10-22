@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102b55">
+
+    <title>UniAttend | Student Dashboard</title>
+    <link rel="stylesheet" href="css/student-dashboard.css">
+</head>
+
+<body>
+    <div class="ua-layout">
+
+        <!-- Sidebar -->
+        <aside class="ua-sidebar">
+            <div class="ua-brand">
+                <div class="ua-brand-icon">U</div>
+                <span>UniAttend</span>
+            </div>
+
+            <nav class="ua-nav" aria-label="القائمة الرئيسية">
+                <button
+                    type="button"
+                    class="active"
+                    data-section="overview">
+                    الرئيسية
+                </button>
+
+                <button type="button" data-section="scan">
+                    تسجيل الحضور
+                </button>
+
+                <button type="button" data-section="history">
+                    سجل الحضور
+                </button>
+            </nav>
+
+            <div class="ua-sidebar-note">
+                نظام الحضور الجامعي الذكي
+                <br>
+                تابع محاضراتك وحضورك من مكان واحد.
+            </div>
+
+            <button
+                id="logoutButton"
+                class="ua-button"
+                type="button">
+                تسجيل الخروج
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ua-main">
+            <header class="ua-topbar">
+                <div>
+                    <h1 id="pageTitle">Student Dashboard</h1>
+                    <p class="ua-muted">
+                        مرحبًا بك في لوحة متابعة حضورك الجامعي.
+                    </p>
+                </div>
+
+                <div class="ua-user-chip">
+                    <div class="ua-avatar" aria-hidden="true">ط</div>
+                    <div>
+                        <strong id="headerStudentName">
+                            جاري التحميل...
+                        </strong>
+                        <div class="ua-muted">حساب طالب</div>
+                    </div>
+                </div>
+            </header>
+
+            <p
+                id="dashboardMessage"
+                class="ua-message"
+                role="status"
+                aria-live="polite"></p>
+
+            <!-- Overview -->
+            <section id="overviewSection" class="ua-section">
+                <div class="ua-grid">
+
+                    <article class="ua-card">
+                        <h2>أهلًا بيك </h2>
+                        <p class="ua-muted">
+                            من هنا تقدر تراجع بيانات حسابك وتنتقل لتسجيل
+                            حضور المحاضرات.
+                        </p>
+
+                        <button
+                            class="ua-button"
+                            type="button"
+                            data-go="scan">
+                            تسجيل حضور محاضرة
+                        </button>
+                    </article>
+
+                    <article class="ua-card">
+                        <h2>ملخص الحضور</h2>
+                        <p class="ua-muted">
+                            سيتم عرض إحصائيات حضورك بعد ربط لوحة الطالب
+                            ببيانات المحاضرات وسجل الحضور في قاعدة البيانات.
+                        </p>
+
+                        <div class="ua-notice">
+                            لم يتم تحميل إحصائيات الحضور حتى الآن.
+                        </div>
+                    </article>
+
+                    <article class="ua-card ua-full">
+                        <h2>بيانات الطالب</h2>
+
+                        <dl class="ua-profile-list">
+                            <div class="ua-profile-row">
+                                <dt>الاسم الكامل</dt>
+                                <dd id="studentName">جاري التحميل...</dd>
+                            </div>
+
+                            <div class="ua-profile-row">
+                                <dt>الرقم الجامعي</dt>
+                                <dd id="studentUniversityId">
+                                    جاري التحميل...
+                                </dd>
+                            </div>
+
+                            <div class="ua-profile-row">
+                                <dt>البريد الإلكتروني</dt>
+                                <dd id="studentEmail">جاري التحميل...</dd>
+                            </div>
+                        </dl>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- QR Attendance -->
+            <section id="scanSection" class="ua-section" hidden>
+                <article class="ua-card ua-center">
+                    <h2>تسجيل حضور محاضرة</h2>
+
+                    <p class="ua-muted">
+                        امسح رمز QR الذي يعرضه الدكتور أثناء المحاضرة
+                        لتسجيل حضورك بعد التحقق من الشروط المطلوبة.
+                    </p>
+
+                    <div id="qrReader" style="display:none; max-width:520px; margin:18px auto;"></div>
+                    <div class="ua-qr-icon" id="qrPlaceholder" aria-hidden="true">▦</div>
+
+<div class="ua-location-box">
+    <h3>التحقق من موقعك</h3>
+
+    <p class="ua-muted">
+        حدّد موقعك قبل مسح رمز QR. سيُعاد التحقق من موقعك عند كل محاولة حضور.
+    </p>
+
+    <button
+        id="getStudentLocationButton"
+        class="ua-button"
+        type="button">
+        تحديد موقعي
+    </button>
+
+    <p
+        id="studentLocationMessage"
+        class="ua-message"
+        role="status"
+        aria-live="polite">
+        لم يتم تحديد الموقع بعد.
+    </p>
+
+    <p id="studentLocationAccuracy" class="ua-muted"></p>
+</div>
+
+                    <div class="ua-notice">
+                        تسجيل الحضور يحتاج إلى التحقق من صلاحية رمز QR
+                        ومدة المحاضرة وموقعك الجغرافي من خلال النظام.
+                    </div>
+
+                    <p class="ua-muted">
+                        اسمح باستخدام الكاميرا والموقع عند الطلب، ثم وجّه الكاميرا إلى رمز الدكتور.
+                    </p>
+
+                    <button
+                        id="scanQrButton"
+                        class="ua-button"
+                        type="button">
+                        مسح رمز QR
+                    </button>
+
+                    <p
+                        id="scanMessage"
+                        class="ua-message"
+                        role="status"
+                        aria-live="polite"></p>
+                </article>
+            </section>
+
+            <!-- Attendance History -->
+            <section id="historySection" class="ua-section" hidden>
+                <article class="ua-card">
+                    <h2>سجل الحضور</h2>
+
+                    <p class="ua-muted">
+                        يعرض هذا القسم سجلات الحضور المسجلة لحسابك.
+                    </p>
+                </article>
+            </section>
+
+            <footer class="ua-footer">
+                UniAttend · Smart Attendance Management System
+            </footer>
+        </main>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="supabase-config.js"></script>
+
+    <script src="js/student-dashboard.js"></script>
+</body>
+</html>
