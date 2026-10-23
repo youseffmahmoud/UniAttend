@@ -519,19 +519,21 @@ registerButton?.addEventListener("click", async () => {
             throw error;
         }
 
-        if (data.session) {
-            showMessage(
-                "تم إنشاء الحساب بنجاح. تحقق من ظهور بيانات الطالب في جدول profiles قبل تسجيل الدخول.",
-                "",
-                registerMessage
-            );
-        } else {
-            showMessage(
-                "تم إرسال طلب إنشاء الحساب. إذا كان تأكيد البريد مطلوبًا، راجع بريدك الإلكتروني.",
-                "",
-                registerMessage
-            );
-        }
+        
+if (data.session) {
+    showMessage(
+        "تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.",
+        "success",
+        registerMessage
+    );
+} else {
+    showMessage(
+        "تم إنشاء حسابك بنجاح. يرجى مراجعة بريدك الإلكتروني لتأكيد الحساب قبل تسجيل الدخول.",
+        "success",
+        registerMessage
+    );
+}
+
 
         console.log("SIGNUP SUCCESS:", {
             userId: data.user?.id,
