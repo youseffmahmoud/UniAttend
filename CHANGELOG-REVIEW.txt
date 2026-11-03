@@ -1,0 +1,43 @@
+UniAttend — Review and update notes
+====================================
+
+Changes in this package
+-----------------------
+1. Corrected the admin dashboard Edge Function invocation:
+   - Before: `create-doctor` (did not match the deployed function folder).
+   - Now: `admin-create-doctor`.
+
+2. Updated doctor creation to match the requested workflow:
+   - Admin enters name, email, university ID, and password.
+   - The Edge Function verifies the caller's JWT and ADMIN profile role.
+   - It creates a confirmed Supabase Auth account with the admin-defined password.
+   - No invitation email or mandatory first-login password reset is used.
+   - Service-role credentials remain server-side.
+   - The function checks APP_ORIGIN and rejects mismatched browser origins.
+
+3. Updated README, Arabic Supabase setup instructions, and test checklist.
+
+Static checks performed
+-----------------------
+- JavaScript files passed `node --check`.
+- Local HTML script and stylesheet references were checked; no missing local references found.
+- Duplicate HTML IDs were checked; none found.
+
+Not verified from this ZIP alone
+--------------------------------
+- Live Supabase schema, RLS policies, triggers, RPC definitions, and production data.
+- Edge Function deployment and server-side secrets.
+- Email/password sign-in against the live Auth project.
+- Real QR/GPS attendance and device/IP event insertion.
+- Browser visual behavior on actual mobile/desktop devices.
+
+Important deployment note
+-------------------------
+Set `APP_ORIGIN` as a Supabase Edge Function secret to the exact deployed website origin
+(for example `https://your-site.example`). Deploy the updated function:
+
+    supabase functions deploy admin-create-doctor
+
+Do not expose `SUPABASE_SERVICE_ROLE_KEY` in any browser file. Back up the live
+database and validate the supplied SQL migrations against the actual schema before
+applying them.

@@ -1,0 +1,339 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+
+  <title>UniAttend | لوحة الأدمن</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/admin-dashboard.css">
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">UA</div>
+      <div>
+        <strong>UniAttend</strong>
+        <small>لوحة إدارة النظام</small>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <span id="adminName" class="admin-chip">جارٍ التحقق...</span>
+      <button id="logoutButton" class="btn btn-light" type="button">
+        تسجيل الخروج
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="page-heading">
+      <div>
+        <span class="eyebrow">ADMINISTRATION</span>
+        <h1>لوحة الأدمن</h1>
+        <p>إدارة الحسابات والكورسات والجلسات من مكان واحد.</p>
+      </div>
+
+      <button id="refreshAllButton" class="btn btn-primary" type="button">
+        تحديث البيانات
+      </button>
+    </section>
+
+    <div
+      id="adminMessage"
+      class="message"
+      role="status"
+      aria-live="polite">
+    </div>
+
+    <!-- Statistics -->
+
+    <section class="stats-grid">
+
+      <article class="stat-card">
+        <span>إجمالي الحسابات</span>
+        <strong id="statUsers">—</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>الدكاترة</span>
+        <strong id="statDoctors">—</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>الطلاب</span>
+        <strong id="statStudents">—</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>الكورسات</span>
+        <strong id="statCourses">—</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>الجلسات النشطة</span>
+        <strong id="statSessions">—</strong>
+      </article>
+
+    </section>
+
+    <section class="content-grid">
+
+      <!-- Add Doctor -->
+
+      <article class="panel">
+
+        <div class="panel-heading">
+          <div>
+            <h2>إضافة دكتور</h2>
+            <p>أنشئ حساب الدكتور وحدد له كلمة مرور مباشرة. يمكنه تسجيل الدخول بها دون خطوة تفعيل إجبارية.</p>
+          </div>
+
+          <span class="panel-icon">＋</span>
+        </div>
+
+        <form id="doctorForm" class="form-grid">
+
+          <label>
+            اسم الدكتور
+            <input
+              id="doctorFullName"
+              type="text"
+              maxlength="120"
+              required
+              autocomplete="name"
+              placeholder="الاسم الكامل">
+          </label>
+
+          <label>
+            البريد الإلكتروني
+            <input
+              id="doctorEmail"
+              type="email"
+              maxlength="254"
+              required
+              autocomplete="email"
+              placeholder="doctor@university.edu">
+          </label>
+
+          <label>
+            كلمة المرور
+            <input
+              id="doctorPassword"
+              type="password"
+              minlength="8"
+              maxlength="72"
+              required
+              autocomplete="new-password"
+              placeholder="8 أحرف على الأقل">
+          </label>
+
+          <label>
+            الرقم الوظيفي / الجامعي
+            <input
+              id="doctorUniversityId"
+              type="text"
+              maxlength="40"
+              required
+              placeholder="رقم تعريفي فريد">
+          </label>
+
+          <div class="full">
+            <button
+              id="createDoctorButton"
+              class="btn btn-primary"
+              type="submit">
+              إنشاء حساب الدكتور
+            </button>
+          </div>
+
+        </form>
+
+      </article>
+
+      <!-- Add Course -->
+
+      <article class="panel">
+
+        <div class="panel-heading">
+          <div>
+            <h2>إضافة كورس</h2>
+            <p>اربط الكورس بالدكتور المسؤول عنه.</p>
+          </div>
+
+          <span class="panel-icon">▤</span>
+        </div>
+
+        <form id="courseForm" class="form-grid">
+
+          <label>
+            اسم الكورس
+            <input
+              id="courseName"
+              type="text"
+              maxlength="120"
+              required
+              placeholder="Database Systems">
+          </label>
+
+          <label>
+            كود الكورس
+            <input
+              id="courseCode"
+              type="text"
+              maxlength="40"
+              required
+              placeholder="CS204">
+          </label>
+
+          <label class="full">
+            الدكتور المسؤول
+            <select id="courseDoctor" required>
+              <option value="">حمّل قائمة الدكاترة أولًا</option>
+            </select>
+          </label>
+
+          <div class="full">
+            <button
+              id="createCourseButton"
+              class="btn btn-primary"
+              type="submit">
+              إضافة الكورس
+            </button>
+          </div>
+
+        </form>
+
+      </article>
+
+      <!-- Accounts -->
+
+      <article class="panel full">
+
+        <div class="panel-heading">
+          <div>
+            <h2>الحسابات</h2>
+            <p>عرض حسابات المستخدمين المسجلين وأدوارهم.</p>
+          </div>
+
+          <input
+            id="userSearch"
+            class="search"
+            type="search"
+            placeholder="بحث بالاسم أو الرقم الجامعي أو الدور">
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>الرقم التعريفي</th>
+                <th>الدور</th>
+              </tr>
+            </thead>
+
+            <tbody id="usersTable">
+              <tr>
+                <td colspan="3">جارٍ تحميل الحسابات...</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+      </article>
+
+      <!-- Courses -->
+
+      <article class="panel full">
+
+        <div class="panel-heading">
+          <div>
+            <h2>الكورسات</h2>
+            <p>الكورسات المسجلة بالنظام.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+            <thead>
+              <tr>
+                <th>اسم الكورس</th>
+                <th>الكود</th>
+                <th>الدكتور</th>
+                <th>تاريخ الإضافة</th>
+              </tr>
+            </thead>
+
+            <tbody id="coursesTable">
+              <tr>
+                <td colspan="4">جارٍ تحميل الكورسات...</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+      </article>
+
+      <!-- Attendance Sessions -->
+
+      <article class="panel full">
+
+        <div class="panel-heading">
+          <div>
+            <h2>جلسات الحضور</h2>
+            <p>متابعة الجلسات وإيقاف الجلسة النشطة عند الحاجة.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+            <thead>
+              <tr>
+                <th>الكورس</th>
+                <th>الدكتور</th>
+                <th>البداية</th>
+                <th>النهاية</th>
+                <th>الحالة</th>
+                <th>الإجراء</th>
+              </tr>
+            </thead>
+
+            <tbody id="sessionsTable">
+              <tr>
+                <td colspan="6">جارٍ تحميل الجلسات...</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    <footer>
+      UniAttend © إدارة الحضور الجامعي
+    </footer>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="js/admin-dashboard.js"></script>
+
+</body>
+</html>

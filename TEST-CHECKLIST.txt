@@ -1,0 +1,47 @@
+UniAttend validation checklist
+
+[ ] Existing login works for a student.
+[ ] Existing login works for a doctor.
+[ ] Admin account was created privately and its profiles.role is ADMIN.
+[ ] Non-admin cannot open admin-dashboard.html or call admin-create-doctor.
+[ ] admin-create-doctor Edge Function is deployed with server-side secrets and the exact APP_ORIGIN.
+[ ] Admin-created doctor can sign in immediately using the email and password supplied by the admin.
+[ ] The admin-create-doctor function rejects a non-admin JWT.
+[ ] The function rejects requests from an Origin other than APP_ORIGIN.
+[ ] Duplicate email and duplicate university ID are rejected without leaving orphan Auth users.
+[ ] Existing QR attendance still succeeds and expired/invalid QR is rejected server-side.
+[ ] Doctor can issue a six-digit manual code and it expires after 60 seconds.
+[ ] Manual-code function exists with matching signature and enforces the same checks server-side.
+[ ] Doctor can export a session CSV.
+[ ] CSV analysis handles valid rows, duplicate IDs, poor GPS accuracy, and out-of-radius distances.
+[ ] Admin can view profiles/courses/sessions only under correct RLS policies.
+[ ] Test with a student account and a doctor account before production use.
+
+
+NEW FEATURES TO VERIFY AFTER APPLYING THE FEATURE MIGRATION
+[ ] Run feature-migration.sql in a staging Supabase project after confirming column names.
+[ ] Confirm a doctor can edit only their own course name/code.
+[ ] Confirm a doctor can edit the time/radius of ended sessions only.
+[ ] Confirm a doctor can archive and restore only their own ended sessions.
+[ ] Confirm archived sessions keep attendance rows and CSV export still works.
+[ ] Deploy log-attendance-device Edge Function and set secrets server-side.
+[ ] Record a test attendance and confirm student_devices + attendance_device_events rows are created.
+[ ] Confirm attendance-device events do not contain or expose IP addresses.
+[ ] Run database/remove-ip-tracking.sql after backup if a legacy ip_address column exists.
+[ ] Confirm a student cannot read another student's device rows/events.
+[ ] Confirm a doctor can read only device events for their own sessions.
+[ ] Confirm attendance-analysis.html is linked from the doctor dashboard and role-gated.
+[ ] Test role selection cards on mobile and desktop; backend role checks must still block mismatched roles.
+[ ] Test QR expiry set to 60 seconds and manual-code RPC signature against the live database.
+[ ] Test the manual coordinates flow using trusted map coordinates.
+
+
+OPTIONAL GPS QR FLOW (after applying database/optional-gps-qr-migration.sql)
+[ ] Doctor creates a QR session with GPS permission denied / no coordinates.
+[ ] Student scans QR without any GPS permission prompt and is checked in.
+[ ] Expired QR token is rejected.
+[ ] QR for an inactive/ended session is rejected.
+[ ] Second check-in by the same student for the same session is rejected.
+[ ] A non-student account cannot check in.
+[ ] Distance is NULL when either side has no coordinates; when present it is informational only.
+[ ] Manual six-digit code path is tested separately; it is not covered by the optional-GPS QR migration.
